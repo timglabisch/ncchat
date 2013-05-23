@@ -18,7 +18,7 @@ net.createServer(function(socket) {
         return client.write(message + "\n");
       } else {
         clients.splice(clients.indexOf(client), 1);
-        return broadcast(" - - - - - - - - - - - -\n" + client.name + " killed.\n" + " - - - - - - - - - - - -\n");
+        return broadcast("\n - - - - - - - - - - - -\n" + client.name + " killed.\n" + " - - - - - - - - - - - -\n");
       }
     });
   };
@@ -34,16 +34,19 @@ net.createServer(function(socket) {
         socket.write(tmp + "+ - - - - - - - - - - - -\n\n");
       } else {
         clients.splice(clients.indexOf(socket), 1);
-        broadcast(" - - - - - - - - - - - -\n" + socket.name + " killed.\n" + " - - - - - - - - - - - -\n");
+        broadcast("\n - - - - - - - - - - - -\n" + socket.name + " killed.\n" + " - - - - - - - - - - - -\n");
       }
       return;
     }
-    return broadcast(socket.name + ": " + msg, socket);
+    return broadcast("\033[0;32m" + socket.name + "\033[0m" + ": " + msg, socket);
   };
   socket.name = socket.remoteAddress + ":" + socket.remotePort;
   clients.push(socket);
-  socket.write(fs.readFileSync('../welcome') + "\n" + " ~ Welcome " + socket.name + "\n\n" + " - - - - - - - - - - - - - - - - - - - - - - - -\n\n");
-  broadcast(" - - - - - - - - - - - -\n" + socket.name + " joined.\n" + " - - - - - - - - - - - -\n", socket);
+  socket.write("\033[1m");
+  socket.write(fs.readFileSync('../welcome'));
+  socket.write("\033[0m");
+  socket.write(" ~ Welcome " + socket.name + "\n\n" + " - - - - - - - - - - - - - - - - - - - - - - - -\n\n");
+  broadcast("\n - - - - - - - - - - - -\n" + socket.name + " joined.\n" + " - - - - - - - - - - - -\n", socket);
   buf = '';
   socket.on('data', function(data) {
     var i, msg, msgs;
@@ -61,6 +64,6 @@ net.createServer(function(socket) {
   });
   return socket.on('end', function() {
     clients.splice(clients.indexOf(socket), 1);
-    return broadcast(" - - - - - - - - - - - -\n" + socket.name + " left.\n" + " - - - - - - - - - - - -\n");
+    return broadcast("\n - - - - - - - - - - - -\n" + socket.name + " left.\n" + " - - - - - - - - - - - -\n");
   });
 }).listen(5000);
