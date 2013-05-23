@@ -13,7 +13,12 @@ net.createServer(function(socket) {
       if (client === sender) {
         return;
       }
-      return client.write(message + "\n");
+      if (client.writable) {
+        return client.write(message + "\n");
+      } else {
+        clients.splice(clients.indexOf(client), 1);
+        return broadcast(" - - - - - - - - - - - -\n" + client.name + " killed.\n" + " - - - - - - - - - - - -\n");
+      }
     });
   };
   onDataHandle = function(msg, socket) {
@@ -24,7 +29,12 @@ net.createServer(function(socket) {
         c = clients[_i];
         tmp += '| ' + c.name + "\n";
       }
-      socket.write(tmp + "+ - - - - - - - - - - - -\n\n");
+      if (socket.writable) {
+        socket.write(tmp + "+ - - - - - - - - - - - -\n\n");
+      } else {
+        clients.splice(clients.indexOf(socket), 1);
+        broadcast(" - - - - - - - - - - - -\n" + socket.name + " killed.\n" + " - - - - - - - - - - - -\n");
+      }
       return;
     }
     return broadcast(socket.name + ": " + msg, socket);
