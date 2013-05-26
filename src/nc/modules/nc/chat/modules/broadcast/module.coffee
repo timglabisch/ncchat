@@ -6,15 +6,8 @@ class nc.modules.nc.chat.modules.broadcast.module extends elastic.abstractModule
     @channelmanager = @sm.getService 'chat.channelmanager'
 
   onClientCommandMsg: (command, c, msg) ->
-    if msg.toChannel != null
-      return @onClientCommandMsgToChannel command, c, msg
+    if msg.toChannel == null
+      return true
 
-    @clientmanager.eachClient (client) ->
-      # dont broadcast to the sender ...
-      return if client == c
-      client.send msg
-    true
-
-  onClientCommandMsgToChannel: (command, c, msg) ->
     @channelmanager.broadcastToChannel msg.toChannel, msg
     true

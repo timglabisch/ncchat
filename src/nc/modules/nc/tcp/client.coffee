@@ -48,8 +48,13 @@ class nc.modules.nc.tcp.client extends nc.modules.nc.chat.client
   send: (msg) ->
     return @close() if !@tcpSocket.writable
     if msg.toChannel
-     @tcpSocket.write `"\033[0;32m"` + msg.toChannel + `"\033[0m "`
-    @tcpSocket.write `"\033[0;32m"` + msg.from.getName() + `"\033[0m "` + msg.data + "\n"
+      @tcpSocket.write `"\033[0;32m"` + msg.toChannel + `"\033[0m"`
+
+      # bei einer nachricht vom aktiven channel ein * in rot dahinter setzen.
+      if msg.toChannel == @currentChannel
+        @tcpSocket.write `"\033[0;31m*\033[0m"`
+
+    @tcpSocket.write `" \033[0;32m"` + msg.from.getName() + `"\033[0m "` + msg.data + "\n"
 
   close: ->
     @emit 'close', @
