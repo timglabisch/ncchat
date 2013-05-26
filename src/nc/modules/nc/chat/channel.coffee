@@ -6,6 +6,9 @@ class nc.modules.nc.chat.channel extends elastic.eventEmitter
   getClients: ->
     @clients
 
+  eachClient: (cb) ->
+    @clients.forEach cb
+
   join: (client) ->
     @clients.push client
     @emit 'join', client

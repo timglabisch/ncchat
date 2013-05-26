@@ -3,7 +3,11 @@ class nc.modules.nc.chat.services.channelmanager  extends elastic.abstractServic
   name : 'chat.channelmanager'
 
   constructor: (@sm) ->
-    @channels = []
+    @channels = {}
+
+  eachChannel: (cb)->
+    for c of @channels
+      cb @channels[c];
 
   unjoinChannel: (name, client) ->
     if typeof @channels[name] == "undefined"

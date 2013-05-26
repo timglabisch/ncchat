@@ -8,6 +8,13 @@ class nc.modules.nc.tcp.client extends nc.modules.nc.chat.client
 
     # every client joins the lobby be default
     @sm.getService('chat.channelmanager').joinChannel @currentChannel, @
+    @_sendWelcome()
+
+  _sendWelcome: ->
+    @tcpSocket.write(`"\033[1m"`)
+    @tcpSocket.write require('fs').readFileSync('../welcome');
+    @tcpSocket.write(`"\033[0m"`)
+    @tcpSocket.write(`"please run \033[0;31m/name [NAME]\033[0m to set you name. type \033[0;31m/?\033[0m for help.\n"`)
 
   _onSocketData: (data) ->
     @buf += data.toString();
@@ -55,6 +62,9 @@ class nc.modules.nc.tcp.client extends nc.modules.nc.chat.client
         @tcpSocket.write `"\033[0;31m*\033[0m"`
 
     @tcpSocket.write `" \033[0;32m"` + msg.from.getName() + `"\033[0m "` + msg.data + "\n"
+
+  sendRaw: (raw) ->
+    @tcpSocket.write raw
 
   close: ->
     @emit 'close', @
