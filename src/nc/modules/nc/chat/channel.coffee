@@ -17,7 +17,7 @@ class nc.modules.nc.chat.channel extends elastic.eventEmitter
     @emit 'unjoin', client, @
 
   broadcast: (msg) ->
-    @clients.each (client) ->
+    @clients.forEach (client) ->
       # dont broadcast to the sender ...
       return if client == msg.from
       client.send msg

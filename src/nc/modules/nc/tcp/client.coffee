@@ -1,9 +1,13 @@
 class nc.modules.nc.tcp.client extends nc.modules.nc.chat.client
 
-  constructor: (@tcpSocket) ->
+  constructor: (@sm, @tcpSocket) ->
     @tcpSocket.on 'data', @_onSocketData.bind @
     @tcpSocket.on 'end', @_onSocketEnd.bind @
-    @buf = '';
+    @currentChannel = 'lobby'
+    @buf = ''
+
+    # every client joins the lobby be default
+    @sm.getService('chat.channelmanager').joinChannel @currentChannel, @
 
   _onSocketData: (data) ->
     @buf += data.toString();
@@ -37,12 +41,14 @@ class nc.modules.nc.tcp.client extends nc.modules.nc.chat.client
       msg.setArgs rawMsg.splice 1
       return msg
 
-    msg.setToChannel 'lobby'
+    msg.setToChannel @currentChannel
     msg.setCommand 'msg'
     msg.setData rawMsg
 
   send: (msg) ->
     return @close() if !@tcpSocket.writable
+    if msg.toChannel
+     @tcpSocket.write `"\033[0;32m"` + msg.toChannel + `"\033[0m "`
     @tcpSocket.write `"\033[0;32m"` + msg.from.getName() + `"\033[0m "` + msg.data + "\n"
 
   close: ->

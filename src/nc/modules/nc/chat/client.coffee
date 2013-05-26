@@ -15,3 +15,6 @@ class nc.modules.nc.chat.client extends elastic.eventEmitter
     @name
 
   setName: (@name) ->
+
+  channelJoined: (channel) ->
+    @currentChannel = channel.name

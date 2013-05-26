@@ -5,35 +5,43 @@ class nc.modules.nc.chat.services.channelmanager  extends elastic.abstractServic
   constructor: (@sm) ->
     @channels = []
 
-
   unjoinChannel: (name, client) ->
     if typeof @channels[name] == "undefined"
       return false
 
     return @channels[name].unJoin client
 
+  broadcastToChannel: (name, msg) ->
+    if typeof @channels[name] == "undefined"
+      return false
+
+    return @channels[name].broadcast msg
+
   joinChannel: (name, client) ->
-    console.log "client " + client.getName() + " wants to join channel " + name
 
-    if typeof @channels[name] != "undefined"
-      return @channels[name]
+    if typeof @channels[name] == "undefined"
+      console.log "create channel " + name
+      channel = new nc.modules.nc.chat.channel name
 
-    console.log "create channel " + name
+      # drop channel if empty
+      channel.on 'unjoin', (client, channel) =>
+        console.log "client " + client.getName() + " unjoins " + channel.name
+        return if channel.getClients().length != 0
+        @channels.splice(@channels.indexOf(channel), 1)
+        console.log "channel " + channel.name + " dropped"
 
-    channel = new nc.modules.nc.chat.channel name
-    channel.join client
+      @channels[name] = channel
 
-    client.on 'close', =>
-      return if typeof @channels[name] == "undefined"
+    client.channelJoined @channels[name]
+    @channels[name].join client
+
+    console.log "client " + client.getName() + " joins channel " + name
+
+    client.on 'close', (client) =>
+      console.log("drop client by channelmannager!")
+      if typeof @channels[name] == "undefined"
+        return console.log("debug: cant drop empty channel")
       @channels[name].unJoin client
-
-    channel.on 'unjoin', (client, channel) =>
-      console.log "client " + client.getName() + " unjoins " + channel.name
-      return if channel.getClients().length != 0
-      @channels.splice(@channels.indexOf(channel), 1)
-      console.log "channel " + channel.name + " dropped"
-
-    @channels[name] = channel
 
     return @channels[name];
 

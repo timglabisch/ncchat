@@ -18,5 +18,5 @@ class nc.modules.nc.tcp.services.server  extends elastic.abstractService
     ).listen @port
 
   onNewClientConnection: (socket) ->
-    client = new nc.modules.nc.tcp.client socket;
+    client = new nc.modules.nc.tcp.client @sm, socket;
     @clientmanager.addClient client
